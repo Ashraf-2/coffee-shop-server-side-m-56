@@ -27,11 +27,15 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
-
-    const coffeeCollection = client.db("coffeeDB").collection('coffee');
-
+    //database collections
+    // const coffeeCollection = client.db("coffeeDB").collection('coffee');
+    const coffeeCollection = client.db("coffeeDB")
+    const coffeCL = coffeeCollection.collection('coffee');
+    // const userCollection = client.db("userDB").collection('user');
+    const userCl = coffeeCollection.collection('user'); 
+    //coffee related CRUD operations
     app.get('/coffee',async(req,res)=> {
-        const cursor = coffeeCollection.find();
+        const cursor = coffeCL.find(); //coffeecl modified
         const result = await cursor.toArray();
         res.send(result);
 
@@ -40,14 +44,14 @@ async function run() {
     app.get('/coffee/:id',async(req,res)=> {
         const id = req.params.id;
         const query = {_id: new ObjectId(id)};
-        const result = await coffeeCollection.findOne(query);
+        const result = await coffeCL.findOne(query);  //cl modiefed
         res.send(result);
     })
 
     app.post('/coffee', async(req,res)=> {
         const newCoffee = req.body;
         console.log(newCoffee);
-        const result = await coffeeCollection.insertOne(newCoffee);
+        const result = await coffeCL.insertOne(newCoffee);  //cl modiefied
         res.send(result);
     })
 
@@ -69,15 +73,26 @@ async function run() {
           photo_url:updatedCOffee.photo_url
         }
       }
-      const result  = await coffeeCollection.updateOne(filter,coffee1,options)
+      const result  = await coffeCL.updateOne(filter,coffee1,options) //cl mod
       res.send(result);
     })
 
     app.delete('/coffee/:id',async(req,res)=> {
       const id = req.params.id;
       const query = {_id: new ObjectId(id)};
-      const result = await coffeeCollection.deleteOne(query);
+      const result = await userCl.deleteOne(query);
       res.send(result);
+    })
+
+
+    //user related CRUD operations - apis
+
+    //**QUESTION: why not app.get() function like the top most above of coffee management crud?
+    app.post('/user',async(req,res)=> {
+      const newUser = req.body;
+      console.log('user:',newUser);
+      const result = await userCl.insertOne(newUser);
+      res.send(result)
     })
 
 
