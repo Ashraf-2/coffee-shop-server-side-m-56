@@ -34,11 +34,11 @@ async function run() {
     // const userCollection = client.db("userDB").collection('user');
     const userCl = coffeeCollection.collection('user'); 
     //coffee related CRUD operations
+    
     app.get('/coffee',async(req,res)=> {
         const cursor = coffeCL.find(); //coffeecl modified
         const result = await cursor.toArray();
         res.send(result);
-
     })
 
     app.get('/coffee/:id',async(req,res)=> {
@@ -95,8 +95,31 @@ async function run() {
       res.send(result)
     })
 
+    app.get('/user',async(req,res) => {
+      const cursor = userCl.find();
+      const users = await cursor.toArray();
+      res.send(users);
+    })
 
+    app.delete('/user/:id',async(req,res) => {
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)};
+      const result = await userCl.deleteOne(query);
+      res.send(result);
+    })
 
+    //for lastlogged in
+    app.patch('/user',async(req,res) => {
+      const user = req.body;
+      const filter = {email: user.email}
+      const updateDoc = {
+        $set: {
+          lastloggedAt: user.lastloggedAt
+        }
+      }
+      const result = await userCl.updateOne(filter,updateDoc)
+      res.send(result);
+    })
 
 
 
